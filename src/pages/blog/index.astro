@@ -1,6 +1,6 @@
 ---
-import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
@@ -22,12 +22,11 @@ const [featured, ...rest] = posts;
 	<body>
 		<Header />
 
-		<main>
+		<main class="page">
 			<header class="page-head">
-				<p class="eyebrow">Writing</p>
-				<h1>Notes &amp; guides</h1>
-				<p class="lede">
-					Short, practical pieces on building a Shopify store that sells — setup, conversion,
+				<h1 class="rise">Notes &amp; guides</h1>
+				<p class="lede rise" style="--rise-delay: 90ms">
+					Short, practical pieces on building a Shopify store that sells. Setup, conversion,
 					and the small tools that do the heavy lifting.
 				</p>
 			</header>
@@ -38,49 +37,38 @@ const [featured, ...rest] = posts;
 				<section aria-label="Blog posts">
 					{featured && (
 						<a class="featured" href={`/blog/${featured.id}/`}>
-							{featured.data.heroImage && (
-								<div class="thumb thumb--featured">
-									<Image
-										width={1200}
-										height={600}
-										src={featured.data.heroImage}
-										alt={featured.data.title}
-										loading="eager"
-									/>
-								</div>
-							)}
-							<div class="meta">
+							<div class="featured-meta">
 								<FormattedDate date={featured.data.pubDate} />
 							</div>
 							<h2 class="featured-title">{featured.data.title}</h2>
 							{featured.data.description && (
 								<p class="excerpt">{featured.data.description}</p>
 							)}
+							<span class="featured-cta">Read the note <span aria-hidden="true">&rarr;</span></span>
 						</a>
 					)}
 
 					{rest.length > 0 && (
-						<ul class="grid">
+						<ul class="post-list">
 							{rest.map((post) => (
 								<li>
-									<a class="card" href={`/blog/${post.id}/`}>
-										{post.data.heroImage && (
-											<div class="thumb">
-												<Image
-													width={720}
-													height={400}
-													src={post.data.heroImage}
-													alt={post.data.title}
-													loading="lazy"
-												/>
-											</div>
-										)}
-										<div class="meta">
+									<a class="row" href={`/blog/${post.id}/`}>
+										<time class="row-date" datetime={post.data.pubDate.toISOString()}>
 											<FormattedDate date={post.data.pubDate} />
-										</div>
-										<h3 class="card-title">{post.data.title}</h3>
-										{post.data.description && (
-											<p class="excerpt">{post.data.description}</p>
+										</time>
+										<span class="row-body">
+											<h3>{post.data.title}</h3>
+											{post.data.description && <p>{post.data.description}</p>}
+										</span>
+										{post.data.heroImage && (
+											<Image
+												class="row-thumb"
+												width={112}
+												height={72}
+												loading="lazy"
+												src={post.data.heroImage}
+												alt=""
+											/>
 										)}
 									</a>
 								</li>
@@ -96,183 +84,159 @@ const [featured, ...rest] = posts;
 </html>
 
 <style>
-	/* --- Layout ---------------------------------------------------------- */
-	main {
-		--ink: rgb(var(--black, 20 22 26));
-		--ink-soft: rgb(var(--gray, 100 110 125));
-		--accent: rgb(var(--accent, 63 107 43));
-		--line: color-mix(in srgb, var(--ink) 12%, transparent);
-		--radius: 14px;
-
-		width: 100%;
-		max-width: 960px;
-		margin: 0 auto;
-		padding: 0 1.25rem 6rem;
-		color: var(--ink);
-	}
-
-	/* --- Page header ----------------------------------------------------- */
+	/* --- Page header --- */
 	.page-head {
-		padding: 4.5rem 0 3rem;
-		max-width: 42rem;
-	}
-
-	.eyebrow {
-		margin: 0 0 0.75rem;
-		font-size: 0.8125rem;
-		font-weight: 600;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--accent);
+		padding: clamp(4rem, 10vw, 6.5rem) 0 clamp(2.5rem, 7vw, 4rem);
+		max-width: 46rem;
 	}
 
 	.page-head h1 {
-		margin: 0;
-		font-size: clamp(1.875rem, 4vw, 2.75rem);
-		line-height: 1.1;
-		letter-spacing: -0.02em;
-		text-wrap: balance;
+		font-size: clamp(2.25rem, 5.5vw, 3.4rem);
+		line-height: 1.08;
+		letter-spacing: -0.028em;
 	}
 
 	.lede {
-		margin: 1rem 0 0;
-		font-size: 1.0625rem;
+		margin-top: 1.25rem;
+		max-width: var(--measure);
+		font-size: 1.125rem;
 		line-height: 1.65;
-		color: var(--ink-soft);
+		color: var(--text-2);
 		text-wrap: pretty;
 	}
 
-	/* --- Shared card pieces ---------------------------------------------- */
-	.meta {
-		font-size: 0.8125rem;
-		color: var(--ink-soft);
-		letter-spacing: 0.01em;
-	}
-
-	.excerpt {
-		margin: 0.5rem 0 0;
-		font-size: 0.9375rem;
-		line-height: 1.6;
-		color: var(--ink-soft);
-		text-wrap: pretty;
-	}
-
-	.thumb {
-		overflow: hidden;
-		border-radius: var(--radius);
-		margin-bottom: 1rem;
-		background: color-mix(in srgb, var(--ink) 5%, transparent);
-	}
-
-	.thumb :global(img) {
-		display: block;
-		width: 100%;
-		height: auto;
-		aspect-ratio: 16 / 9;
-		object-fit: cover;
-		transition: transform 0.4s ease;
-	}
-
-	.thumb--featured :global(img) {
-		aspect-ratio: 2 / 1;
-	}
-
-	/* --- Featured post --------------------------------------------------- */
+	/* --- Featured post --- */
 	.featured {
 		display: block;
+		padding: 2.25rem 0 2.5rem;
+		border-top: 1px solid var(--line);
+		border-bottom: 1px solid var(--line);
 		text-decoration: none;
 		color: inherit;
-		margin-bottom: 3.5rem;
+	}
+
+	.featured-meta {
+		font-size: 0.8125rem;
+		color: var(--text-2);
 	}
 
 	.featured-title {
-		margin: 0.5rem 0 0;
-		font-size: clamp(1.5rem, 3vw, 2rem);
+		margin-top: 0.65rem;
+		max-width: 38rem;
+		font-size: clamp(1.6rem, 3.5vw, 2.15rem);
 		line-height: 1.15;
 		letter-spacing: -0.02em;
 		text-wrap: balance;
-		transition: color 0.15s ease;
+		transition: color 0.18s ease;
 	}
 
 	.featured:hover .featured-title {
 		color: var(--accent);
 	}
 
-	.featured:hover .thumb :global(img) {
-		transform: scale(1.02);
+	.excerpt {
+		margin-top: 0.7rem;
+		max-width: 52ch;
+		font-size: 1rem;
+		line-height: 1.6;
+		color: var(--text-2);
+		text-wrap: pretty;
 	}
 
-	/* --- Grid of remaining posts ----------------------------------------- */
-	.grid {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 2.5rem 2rem;
+	.featured-cta {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		margin-top: 1.15rem;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		color: var(--accent);
+	}
+
+	.featured-cta span {
+		transition: transform 0.18s ease;
+	}
+
+	.featured:hover .featured-cta span {
+		transform: translateX(3px);
+	}
+
+	/* --- Post list --- */
+	.post-list {
 		margin: 0;
 		padding: 0;
 		list-style: none;
 	}
 
-	.card {
-		display: block;
-		text-decoration: none;
+	.section[aria-label='Blog posts'] {
+		padding-bottom: 4rem;
+	}
+
+	.row {
+		display: grid;
+		grid-template-columns: 9.5rem 1fr auto;
+		align-items: center;
+		gap: 1.75rem;
+		padding: 1.35rem 0;
+		border-bottom: 1px solid var(--line);
 		color: inherit;
+		text-decoration: none;
+		transition: background-color 0.18s ease;
 	}
 
-	.card-title {
-		margin: 0.4rem 0 0;
-		font-size: 1.125rem;
-		line-height: 1.3;
-		letter-spacing: -0.01em;
-		text-wrap: balance;
-		transition: color 0.15s ease;
+	.row:hover {
+		background: var(--bg-subtle);
 	}
 
-	.card:hover .card-title {
+	.row:hover .row-body h3 {
 		color: var(--accent);
 	}
 
-	.card:hover .thumb :global(img) {
-		transform: scale(1.03);
+	.row-date {
+		font-size: 0.8125rem;
+		color: var(--text-2);
 	}
 
-	/* --- Empty state ----------------------------------------------------- */
+	.row-body h3 {
+		font-size: 1.0625rem;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+		transition: color 0.18s ease;
+	}
+
+	.row-body p {
+		margin-top: 0.3rem;
+		max-width: 52ch;
+		font-size: 0.9375rem;
+		line-height: 1.55;
+		color: var(--text-2);
+	}
+
+	.row-thumb {
+		width: 88px;
+		height: 56px;
+		border-radius: 8px;
+		object-fit: cover;
+	}
+
 	.empty {
 		padding: 3rem 0;
-		color: var(--ink-soft);
+		color: var(--text-2);
 	}
 
-	/* --- A11y ------------------------------------------------------------ */
-	main a:focus-visible {
-		outline: 2px solid var(--accent);
-		outline-offset: 4px;
-		border-radius: 6px;
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.thumb :global(img),
-		.featured-title,
-		.card-title {
-			transition: none !important;
-		}
-	}
-
-	/* --- Responsive ------------------------------------------------------ */
+	/* --- Responsive --- */
 	@media (max-width: 720px) {
 		.page-head {
-			padding: 3rem 0 2rem;
+			padding-top: 3.5rem;
 		}
 
-		.grid {
+		.row {
 			grid-template-columns: 1fr;
-			gap: 2rem;
+			gap: 0.4rem;
 		}
 
-		.featured {
-			margin-bottom: 2.5rem;
-		}
-
-		.thumb--featured :global(img) {
-			aspect-ratio: 16 / 9;
+		.row-thumb {
+			display: none;
 		}
 	}
 </style>

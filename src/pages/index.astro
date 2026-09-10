@@ -1,7 +1,9 @@
 ---
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
@@ -23,9 +25,6 @@ const topics = [
 		body: 'The small stack that replaces a part-time ops hire.',
 	},
 ];
-
-const fmt = (d: Date) =>
-	d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 ---
 
 <!doctype html>
@@ -36,69 +35,69 @@ const fmt = (d: Date) =>
 	<body>
 		<Header />
 
-		<main>
+		<main class="page">
 			<!-- Hero -->
 			<section class="hero">
-				<p class="eyebrow">Shopify, explained briefly</p>
-				<h1>Short, practical notes on building a Shopify store that sells.</h1>
-				<p class="lede">
-					No 4,000-word roundups. Just the setup, the tweaks, and the tools — written so you can
-					ship something today.
+				<h1 class="rise">
+					Short, practical notes on building a Shopify store that sells.
+				</h1>
+				<p class="lede rise" style="--rise-delay: 90ms">
+					No 4,000-word roundups. Just the setup, the tweaks, and the tools you can
+					ship today.
 				</p>
-				<div class="actions">
+				<div class="actions rise" style="--rise-delay: 180ms">
 					<a class="btn btn--primary" href="/blog/">Read the notes</a>
 					<a class="btn" href="/about/">About this site</a>
 				</div>
 			</section>
 
 			<!-- Latest posts -->
-			{
-				posts.length > 0 && (
-					<section class="section" aria-labelledby="latest">
-						<div class="section-head">
-							<h2 id="latest">Latest</h2>
-							<a class="more" href="/blog/">
-								All posts <span aria-hidden="true">→</span>
+			<section class="section" aria-labelledby="latest">
+				<div class="section-head">
+					<h2 id="latest">Latest</h2>
+					<a class="more" href="/blog/">
+						All posts <span aria-hidden="true">&rarr;</span>
+					</a>
+				</div>
+
+				<ul class="post-list">
+					{posts.map((post) => (
+						<li>
+							<a class="row" href={`/blog/${post.id}/`}>
+								<time class="row-date" datetime={post.data.pubDate.toISOString()}>
+									<FormattedDate date={post.data.pubDate} />
+								</time>
+								<span class="row-body">
+									<h3>{post.data.title}</h3>
+									{post.data.description && <p>{post.data.description}</p>}
+								</span>
+								{post.data.heroImage && (
+									<Image
+										class="row-thumb"
+										width={112}
+										height={72}
+										loading="lazy"
+										src={post.data.heroImage}
+										alt=""
+									/>
+								)}
 							</a>
-						</div>
-
-						<ul class="posts">
-							{posts.map((post) => (
-								<li>
-									<a class="post" href={`/blog/${post.id}/`}>
-										<time datetime={post.data.pubDate.toISOString()}>
-											{fmt(post.data.pubDate)}
-										</time>
-										<h3>{post.data.title}</h3>
-										<p>{post.data.description}</p>
-									</a>
-								</li>
-							))}
-						</ul>
-					</section>
-				)
-			}
-
-			<!-- What you'll find -->
-			<section class="section" aria-labelledby="topics">
-				<h2 id="topics">What you'll find here</h2>
-				<dl class="topics">
-					{topics.map((t) => (
-						<div>
-							<dt>{t.label}</dt>
-							<dd>{t.body}</dd>
-						</div>
+						</li>
 					))}
-				</dl>
+				</ul>
 			</section>
 
-			<!-- Quiet CTA -->
-			<section class="cta">
-				<p>
-					New notes land every couple of weeks. No spam, no launch sequences — just the thing I
-					learned this week.
-				</p>
-				<a class="btn btn--primary" href="/newsletter/">Get the notes</a>
+			<!-- Topics -->
+			<section class="section topics" aria-labelledby="topics-head">
+				<h2 id="topics-head" class="topics-title">What you'll find here</h2>
+				<ul class="topics-grid">
+					{topics.map((t) => (
+						<li>
+							<h3 class="topic-label">{t.label}</h3>
+							<p>{t.body}</p>
+						</li>
+					))}
+				</ul>
 			</section>
 		</main>
 
@@ -107,52 +106,24 @@ const fmt = (d: Date) =>
 </html>
 
 <style>
-	/* --- Tokens ---------------------------------------------------------- */
-	main {
-		--ink: #14161a;
-		--ink-soft: #5b6472;
-		--line: #e6e8ec;
-		--surface: #ffffff;
-		--accent: #3f6b2b; /* muted Shopify green */
-		--radius: 10px;
-		--measure: 62ch;
-
-		display: block;
-		max-width: 68rem;
-		margin: 0 auto;
-		padding: 0 1.25rem 6rem;
-		color: var(--ink);
-	}
-
-	/* --- Hero ------------------------------------------------------------ */
+	/* --- Hero --- */
 	.hero {
-		padding: 5.5rem 0 4rem;
-		max-width: 44rem;
-	}
-
-	.eyebrow {
-		margin: 0 0 1rem;
-		font-size: 0.8125rem;
-		font-weight: 600;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--accent);
+		padding: clamp(4.5rem, 12vw, 8.5rem) 0 clamp(3rem, 8vw, 5rem);
+		max-width: 46rem;
 	}
 
 	.hero h1 {
-		margin: 0;
-		font-size: clamp(2rem, 5vw, 3.25rem);
-		line-height: 1.1;
-		letter-spacing: -0.02em;
-		text-wrap: balance;
+		font-size: clamp(2.35rem, 6vw, 3.7rem);
+		line-height: 1.08;
+		letter-spacing: -0.028em;
 	}
 
 	.lede {
-		margin: 1.25rem 0 0;
+		margin-top: 1.4rem;
 		max-width: var(--measure);
-		font-size: 1.125rem;
+		font-size: 1.15rem;
 		line-height: 1.65;
-		color: var(--ink-soft);
+		color: var(--text-2);
 		text-wrap: pretty;
 	}
 
@@ -160,42 +131,12 @@ const fmt = (d: Date) =>
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.75rem;
-		margin-top: 2rem;
+		margin-top: 2.1rem;
 	}
 
-	/* --- Buttons --------------------------------------------------------- */
-	.btn {
-		display: inline-block;
-		padding: 0.7rem 1.15rem;
-		border: 1px solid var(--line);
-		border-radius: var(--radius);
-		font-size: 0.9375rem;
-		font-weight: 600;
-		text-decoration: none;
-		color: var(--ink);
-		background: var(--surface);
-		transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
-	}
-
-	.btn:hover {
-		border-color: var(--ink);
-	}
-
-	.btn--primary {
-		background: var(--ink);
-		border-color: var(--ink);
-		color: #fff;
-	}
-
-	.btn--primary:hover {
-		background: var(--accent);
-		border-color: var(--accent);
-		transform: translateY(-1px);
-	}
-
-	/* --- Sections -------------------------------------------------------- */
+	/* --- Sections --- */
 	.section {
-		padding: 3rem 0;
+		padding: clamp(3rem, 8vw, 5rem) 0;
 		border-top: 1px solid var(--line);
 	}
 
@@ -204,18 +145,17 @@ const fmt = (d: Date) =>
 		align-items: baseline;
 		justify-content: space-between;
 		gap: 1rem;
-		margin-bottom: 1.75rem;
+		margin-bottom: 0.5rem;
 	}
 
-	.section h2 {
-		margin: 0;
-		font-size: 1.375rem;
-		letter-spacing: -0.01em;
+	.section-head h2 {
+		font-size: 1.4rem;
+		letter-spacing: -0.015em;
 	}
 
 	.more {
 		font-size: 0.9375rem;
-		color: var(--ink-soft);
+		color: var(--text-2);
 		text-decoration: none;
 		white-space: nowrap;
 	}
@@ -224,107 +164,133 @@ const fmt = (d: Date) =>
 		color: var(--accent);
 	}
 
-	/* --- Post list ------------------------------------------------------- */
-	.posts {
-		display: grid;
-		gap: 1px;
+	/* --- Post list --- */
+	.post-list {
 		margin: 0;
 		padding: 0;
 		list-style: none;
-		background: var(--line);
-		border: 1px solid var(--line);
-		border-radius: var(--radius);
-		overflow: hidden;
 	}
 
-	.post {
-		display: block;
-		padding: 1.5rem 1.75rem;
-		background: var(--surface);
-		text-decoration: none;
+	.row {
+		display: grid;
+		grid-template-columns: 9.5rem 1fr auto;
+		align-items: center;
+		gap: 1.75rem;
+		padding: 1.35rem 0;
+		border-top: 1px solid var(--line);
 		color: inherit;
-		transition: background-color 0.15s ease;
+		text-decoration: none;
+		transition: background-color 0.18s ease;
 	}
 
-	.post:hover {
-		background: #fafbfa;
+	.post-list li:last-child .row {
+		border-bottom: 1px solid var(--line);
 	}
 
-	.post time {
-		font-size: 0.8125rem;
-		color: var(--ink-soft);
+	.row:hover {
+		background: var(--bg-subtle);
 	}
 
-	.post h3 {
-		margin: 0.4rem 0 0.5rem;
-		font-size: 1.125rem;
-		letter-spacing: -0.01em;
-	}
-
-	.post:hover h3 {
+	.row:hover .row-body h3 {
 		color: var(--accent);
 	}
 
-	.post p {
-		margin: 0;
-		max-width: var(--measure);
-		font-size: 0.9375rem;
-		line-height: 1.6;
-		color: var(--ink-soft);
+	.row-date {
+		font-size: 0.8125rem;
+		color: var(--text-2);
 	}
 
-	/* --- Topics ---------------------------------------------------------- */
-	.topics {
-		display: grid;
-		gap: 2rem;
-		margin: 0;
-		grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-	}
-
-	.topics dt {
+	.row-body h3 {
+		font-size: 1.0625rem;
 		font-weight: 600;
-		margin-bottom: 0.4rem;
+		letter-spacing: -0.01em;
+		transition: color 0.18s ease;
 	}
 
-	.topics dd {
-		margin: 0;
+	.row-body p {
+		margin-top: 0.3rem;
+		max-width: 52ch;
+		font-size: 0.9375rem;
+		line-height: 1.55;
+		color: var(--text-2);
+	}
+
+	.row-thumb {
+		width: 88px;
+		height: 56px;
+		border-radius: 8px;
+		object-fit: cover;
+	}
+
+	/* --- Topics --- */
+	.topics-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 2.5rem;
+		margin: 2rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.topics-grid li {
+		padding-right: 1.5rem;
+		border-left: 1px solid var(--line);
+		padding-left: 1.5rem;
+	}
+
+	.topics-grid li:first-child {
+		padding-left: 0;
+		border-left: 0;
+	}
+
+	.topic-label {
+		font-size: 1.0625rem;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+	}
+
+	.topics-grid p {
+		margin-top: 0.55rem;
 		font-size: 0.9375rem;
 		line-height: 1.6;
-		color: var(--ink-soft);
+		color: var(--text-2);
+		text-wrap: pretty;
 	}
 
-	/* --- CTA ------------------------------------------------------------- */
-	.cta {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1.25rem;
-		margin-top: 2rem;
-		padding: 1.75rem 2rem;
-		border: 1px solid var(--line);
-		border-radius: var(--radius);
-		background: #fafbfa;
+	.topics-title {
+		font-size: 1.4rem;
+		letter-spacing: -0.015em;
 	}
 
-	.cta p {
-		margin: 0;
-		max-width: 38ch;
-		font-size: 0.9375rem;
-		line-height: 1.6;
-		color: var(--ink-soft);
-	}
+	/* --- Responsive --- */
+	@media (max-width: 720px) {
+		.hero {
+			padding-top: 3.5rem;
+		}
 
-	/* --- A11y ------------------------------------------------------------ */
-	a:focus-visible {
-		outline: 2px solid var(--accent);
-		outline-offset: 3px;
-		border-radius: 4px;
-	}
+		.row {
+			grid-template-columns: 1fr;
+			gap: 0.4rem;
+		}
 
-	@media (prefers-reduced-motion: reduce) {
-		* {
-			transition: none !important;
+		.row-thumb {
+			display: none;
+		}
+
+		.topics-grid {
+			grid-template-columns: 1fr;
+			gap: 0;
+		}
+
+		.topics-grid li {
+			padding: 1.25rem 0;
+			border-left: 0;
+			border-top: 1px solid var(--line);
+		}
+
+		.topics-grid li:first-child {
+			padding-top: 1.25rem;
+			border-top: 1px solid var(--line);
 		}
 	}
 </style>
